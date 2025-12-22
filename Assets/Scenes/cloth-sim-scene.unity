@@ -1018,9 +1018,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45914f09a88eb654aaa05ffe5ead8e2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 20
-  height: 20
-  spacing: 0.1
+  width: 32
+  height: 32
+  spacing: 0.12
   windMapTexture: {fileID: 2800000, guid: ae17e124c6a979844bb8b00958245b4a, type: 3}
   debugMaterial: {fileID: 2100000, guid: 411b3b5d674b6c24e86856e997c2bd15, type: 2}
   clothMaterial: {fileID: 2100000, guid: 9a72204b53ba8b048a57c67d616ebdd3, type: 2}
@@ -1029,7 +1029,7 @@ MonoBehaviour:
   damping: 2
   windStrength: 5
   dragStrength: 200
-  integrationMode: 0
+  integrationMode: 2
   collisionManager: {fileID: 2122777384}
   showClothGizmo: 0
   allowClothToFall: 0
@@ -1045,7 +1045,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d39e92daf3d630647a7afda853f0b6e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clothCollisionShader: {fileID: 0}
+  clothCollisionShader: {fileID: 7200000, guid: 86b28f0c8d307b44aa20c1b2de19891a, type: 3}
   sphere: {fileID: 875640091}
   cube: {fileID: 3282940}
   _3DMesh: {fileID: 919132149155446097, guid: 702d62c26f73ccf4e979c96e578c72b2, type: 3}
