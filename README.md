@@ -17,17 +17,22 @@ This project describes a **from-scratch real-time cloth physics simulation** imp
 
 ## 🖼️ Sample Results
 
+### Cloth surface and mass–spring constraint visualization
+
 <div align="left">
   <img src="Assets/Resources/rendered-cloth.png" width="260">
   <img src="Assets/Resources/rendered-cloth-grid.png" width="270">  
 </div>
 
+### Cloth collision with sphere, cube, and triangle mesh
+
 <div align="left">
   <img src="Assets/Resources/cloth-sphere-collision.png" width="250">
   <img src="Assets/Resources/cloth-cube-collision-01.png" width="220">
   <img src="Assets/Resources/cloth-mesh-collision.png" width="261">
-  
 </div>
+
+
 
 
 
