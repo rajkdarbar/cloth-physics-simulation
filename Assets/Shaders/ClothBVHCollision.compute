@@ -1,0 +1,190 @@
+#pragma kernel CSMain
+
+struct BVHNode
+{
+    float3 boundsMin;
+    float3 boundsMax;
+    int leftChild; // explicit left child index (- 1 if leaf)
+    int rightChild; // explicit right child index (- 1 if leaf)
+    int startTriangle; // start index in triangle array
+    int triangleCount; // number of triangles if leaf
+};
+
+struct Triangle
+{
+    float3 v0;
+    float3 v1;
+    float3 v2;
+};
+
+StructuredBuffer<BVHNode> bvhNodes;
+StructuredBuffer<Triangle> triangles;
+RWStructuredBuffer<float3> clothPoints;
+RWStructuredBuffer<float3> outNormals;
+
+uint numTriangles;
+uint numBVHNodes;
+uint numClothPoints;
+
+bool AABBContains(float3 minB, float3 maxB, float3 p)
+{
+    return(p.x >= minB.x && p.x <= maxB.x &&
+    p.y >= minB.y && p.y <= maxB.y &&
+    p.z >= minB.z && p.z <= maxB.z);
+}
+
+
+// Check 5.1.5 Closest Point on Triangle to Point (Page 136) from "Real-Time Collision Detection" book by Christer Ericson
+float3 ClosestPointOnTriangle(float3 p, float3 a, float3 b, float3 c)
+{
+    float3 ab = b - a;
+    float3 ac = c - a;
+    float3 ap = p - a;
+
+    float d1 = dot(ab, ap);
+    float d2 = dot(ac, ap);
+
+    // Check if P is in vertex region outside A
+    if (d1 <= 0 && d2 <= 0) return a;
+
+    float3 bp = p - b;
+    float d3 = dot(ab, bp);
+    float d4 = dot(ac, bp);
+
+    // Check if P is in vertex region outside B
+    if (d3 >= 0 && d4 <= d3) return b;
+
+    float3 cp = p - c;
+    float d5 = dot(ab, cp);
+    float d6 = dot(ac, cp);
+
+    // Check if P is in vertex region outside C
+    if (d6 >= 0 && d5 <= d6) return c;
+
+    // Check if P is in edge region of AB, if so return projection onto AB
+    float vc = d1 * d4 - d3 * d2;
+    if (vc <= 0 && d1 >= 0 && d3 <= 0)
+    {
+        float v = d1 / (d1 - d3);
+        return a + v * ab;
+    }
+
+    // Check if P is in edge region of AC, if so return projection onto AC
+    float vb = d5 * d2 - d1 * d6;
+    if (vb <= 0 && d2 >= 0 && d6 <= 0)
+    {
+        float w = d2 / (d2 - d6);
+        return a + w * ac;
+    }
+
+    // Check if P is in edge region of BC, if so return projection onto BC
+    float va = d3 * d6 - d5 * d4;
+    if (va <= 0 && (d4 - d3) >= 0 && (d5 - d6) >= 0)
+    {
+        float w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+        return b + w * (c - b);
+    }
+
+    // P is inside face region. Compute barycentric coordinates and return the point
+    float denom = va + vb + vc;
+    if (abs(denom) < 0.000001) return a; // fallback for degenerate triangle
+
+    float denomInv = 1.0 / denom;
+    float weightTowardsB = vb * denomInv; // vb → weight of B, from area opposite B → edge AC
+    float weightTowardsC = vc * denomInv; // vc → weight of C, from area opposite C → edge AB
+    return a + ab * weightTowardsB + ac * weightTowardsC;
+}
+
+float lengthSquared(float3 v)
+{
+    return dot(v, v);
+}
+
+
+[numthreads(256, 1, 1)]
+void CSMain(uint3 id3D : SV_DispatchThreadID)
+{
+    uint id = id3D.x;
+    if (id >= numClothPoints) return;
+
+    float3 clothPoint = clothPoints[id];
+
+    int stack[64];
+    int counter = 0;
+    stack[counter] = 0; // push root index (0)
+    counter = counter + 1;
+
+    float minDistSq = 1e10;
+    float3 closestPoint = clothPoint;
+    float3 triVertex0 = clothPoint;
+    float3 triVertex1 = clothPoint;
+    float3 triVertex2 = clothPoint;
+
+    while (counter > 0)
+    {
+        counter = counter - 1; // pop
+        int nodeIdx = stack[counter];
+        BVHNode node = bvhNodes[nodeIdx];
+
+        if (! AABBContains(node.boundsMin, node.boundsMax, clothPoint)) continue;
+
+        if (node.triangleCount > 0)
+        {
+            // Leaf node → check triangles
+            for (int i = 0; i < node.triangleCount; i = i + 1)
+            {
+                Triangle tri = triangles[node.startTriangle + i];
+                float3 cp = ClosestPointOnTriangle(clothPoint, tri.v0, tri.v1, tri.v2);
+                float distSq = lengthSquared(cp - clothPoint);
+
+                if (distSq < minDistSq)
+                {
+                    minDistSq = distSq;
+                    closestPoint = cp;
+
+                    triVertex0 = tri.v0;
+                    triVertex1 = tri.v1;
+                    triVertex2 = tri.v2;
+                }
+            }
+        }
+        else
+        {
+            // Internal node → push left and right children if valid
+            if (node.leftChild >= 0)
+            {
+                stack[counter] = node.leftChild; // push
+                counter = counter + 1;
+            }
+
+            if (node.rightChild >= 0)
+            {
+                stack[counter] = node.rightChild; // push
+                counter = counter + 1;
+            }
+        }
+    }
+
+    // Collision decision
+    float margin = 0.12;
+
+    if (minDistSq > margin * margin)
+    return;
+
+    float3 triNormal = normalize(cross(triVertex1 - triVertex0, triVertex2 - triVertex0));
+    float d = dot(clothPoint - closestPoint, triNormal);
+
+    if (d < 0)
+    {
+        triNormal = - triNormal;
+        d = - d;
+    }
+
+    // Penetration test and correction
+    if (d < margin)
+    {
+        float penetration = margin - d;
+        clothPoints[id] = clothPoint + triNormal * penetration;
+        outNormals[id] = triNormal;
+    }
+}
