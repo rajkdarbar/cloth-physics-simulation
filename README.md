@@ -32,7 +32,5 @@ This project describes a **from-scratch real-time cloth physics simulation** imp
   <img src="Assets/Resources/cloth-mesh-collision.png" width="261">
 </div>
 
-
-
-
-
+## 🎥 Demo Video
+A short walkthrough video demonstrating the cloth simulation, interaction controls, and collision behavior is available **[on YouTube](YOUR_VIDEO_LINK_HERE)**.
