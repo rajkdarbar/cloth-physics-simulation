@@ -15,6 +15,8 @@ This project describes a **from-scratch real-time cloth physics simulation** imp
 - GPU compute shader–based BVH traversal and cloth–mesh collision detection  
 - Real-time interaction, runtime parameter tuning, and debug visualization
 
+---
+
 ## 🖼️ Sample Results
 
 #### Cloth surface and mass–spring constraint visualization
@@ -31,6 +33,8 @@ This project describes a **from-scratch real-time cloth physics simulation** imp
   <img src="Assets/Resources/cloth-cube-collision-01.png" width="220">
   <img src="Assets/Resources/cloth-mesh-collision.png" width="261">
 </div>
+
+---
 
 ## 🎥 Demo Video
 A short walkthrough video demonstrating the cloth simulation, interaction controls, and collision behavior is available **[on YouTube](https://youtu.be/Dfn9mNK74pE)**.
