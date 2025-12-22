@@ -30,7 +30,7 @@ This project describes a **from-scratch real-time cloth physics simulation** imp
 
 <div align="left">
   <img src="Assets/Resources/cloth-sphere-collision.png" width="250">
-  <img src="Assets/Resources/cloth-cube-collision-01.png" width="220">
+  <img src="Assets/Resources/cloth-cube-collision.png" width="220">
   <img src="Assets/Resources/cloth-mesh-collision.png" width="261">
 </div>
 
