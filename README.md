@@ -9,7 +9,8 @@ This project describes a **from-scratch real-time cloth physics simulation** imp
 - Mass–spring cloth model with structural, shear, and bend constraints  
 - Spring, damping, wind, drag, and gravity forces  
 - Semi-implicit Euler, Verlet, and Position-Based Dynamics (PBD) integrators  
-- Cloth collision with spheres, cubes, a ground plane, and triangle meshes (PBD only; penetration not fully resolved)  
+- Cloth collision with spheres, cubes, a ground plane, and triangle meshes  
+  *(PBD only; penetration not fully resolved)* 
 - Bounding Volume Hierarchy (BVH) construction from triangle meshes on the CPU
 - BVH flattening into a linear array using pre-order traversal for efficient GPU-side processing
 - GPU compute shader–based BVH traversal and cloth–mesh collision detection  
