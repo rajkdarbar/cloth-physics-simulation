@@ -1024,7 +1024,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   width: 32
-  height: 32
+  height: 20
   spacing: 0.1
   windMapTexture: {fileID: 2800000, guid: ae17e124c6a979844bb8b00958245b4a, type: 3}
   debugMaterial: {fileID: 2100000, guid: 411b3b5d674b6c24e86856e997c2bd15, type: 2}
@@ -1034,7 +1034,7 @@ MonoBehaviour:
   damping: 0.1
   windStrength: 0
   dragStrength: 266
-  integrationMode: 2
+  integrationMode: 0
   collisionManager: {fileID: 2122777384}
   showClothGizmo: 0
   allowClothToFall: 0

@@ -19,8 +19,23 @@ public class ClothVerletIntegrator : ClothPhysicsBase
 
     public override void Integrate(float dt)
     {
+        int maxSubsteps = 5;
+        float maxDt = 1f / 90f;
+        int substeps = 0;
+
+        while (dt > 0f && substeps < maxSubsteps)
+        {
+            float step = Mathf.Min(dt, maxDt);
+            DoIntegration(step);
+            dt -= step;
+            substeps++;
+        }
+    }
+
+    public void DoIntegration(float dt)
+    {
         Vector3 gravity = clothTransform.InverseTransformDirection(Vector3.down * 9.81f);
-        float decayFactor = 0.93f;
+        float decayFactor = 0.98f;
 
         for (int i = 0; i < clothPoints.Count; i++)
         {

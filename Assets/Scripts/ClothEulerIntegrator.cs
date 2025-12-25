@@ -4,7 +4,23 @@ public class ClothEulerIntegrator : ClothPhysicsBase
 {
     public override void Integrate(float dt)
     {
+        int maxSubsteps = 5;
+        float maxDt = 1f / 90f;
+        int substeps = 0;
+
+        while (dt > 0f && substeps < maxSubsteps)
+        {
+            float step = Mathf.Min(dt, maxDt);
+            DoIntegration(step);
+            dt -= step;
+            substeps++;
+        }
+    }
+
+    public void DoIntegration(float dt)
+    {
         Vector3 gravity = clothTransform.InverseTransformDirection(Vector3.down * 9.81f);
+        float decayFactor = 0.98f;
 
         foreach (var p in clothPoints)
         {
@@ -17,7 +33,7 @@ public class ClothEulerIntegrator : ClothPhysicsBase
             p.velocity += acceleration * dt;
             p.position += p.velocity * dt;
 
-            p.velocity *= 0.82f; // damping factor on velocity (optional)
+            p.velocity *= decayFactor; // damping velocity
 
             p.force = Vector3.zero; // reset force
         }

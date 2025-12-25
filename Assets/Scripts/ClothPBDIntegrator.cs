@@ -57,7 +57,7 @@ public class ClothPBDIntegrator : ClothPhysicsBase
         }
     }
 
-    // Call Integrate() per frame
+    // Call Integrate() per frame 
     public override void Integrate(float dt)
     {
         Vector3 gravity = clothTransform.InverseTransformDirection(Vector3.down * 9.81f);
